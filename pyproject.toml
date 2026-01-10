@@ -1,0 +1,70 @@
+[project]
+name = "writefreely-mcp-server"
+version = "0.1.0"
+description = "An MCP server for interacting with WriteFreely API, enabling AI agents like Claude to perform blogging actions. Supports both self-hosted WriteFreely instances and the Write.as hosted service. This is a community-built, independent project."
+authors = [{ name = "Lakshmanan Meiyappan" }]
+license = "MIT" 
+readme = "README.md"
+requires-python = ">=3.10"
+keywords = ["mcp", "writefreely", "api", "ai-agent", "blogging"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "httpx>=0.28.1",
+    "mcp[cli]>=1.25.0",
+    "pydantic>=2.12.5",
+    "python-dotenv>=1.0.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/laxmena/writefreely-mcp-server"
+Repository = "https://github.com/laxmena/writefreely-mcp-server.git"
+Documentation = "https://github.com/laxmena/writefreely-mcp-server#readme"
+Issues = "https://github.com/laxmena/writefreely-mcp-server/issues"
+
+[project.scripts]
+writefreely-mcp = "writefreely_mcp_server.server:main"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3.3",
+    "pytest-asyncio>=0.24.0",
+    "pytest-httpx>=0.30.0",
+    "ruff>=0.6.9",
+    "mypy>=1.12.0",
+    "pre-commit>=4.0.1",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+
+[tool.pytest.ini_options]
+addopts = "-ra -q"  # Verbose failures, quiet mode
+testpaths = ["src/tests"]
+asyncio_mode = "auto"  # Automatically handle async test functions
+
+[tool.hatchling.build.targets.wheel]
+packages = ["src/writefreely_mcp_server"]
+
+[tool.ruff]
+line-length = 88  # PEP 8 standard
+target-version = "py310"
+lint.select = ["E", "F", "I", "UP"]  # Errors, flakes, imports, pyupgrade
+lint.ignore = []
+
+[tool.mypy]
+python_version = "3.10"
+strict = true  # Enforce type hints
+ignore_missing_imports = true  # For external deps like mcp
