@@ -7,9 +7,11 @@ Supports both self-hosted WriteFreely instances and the Write.as hosted service.
 
 import logging
 import os
+import sys
 
 from mcp.server.fastmcp import FastMCP
 
+from . import __version__
 from .config import BASE_URL
 from .tools import auth, collections, feed, posts
 
@@ -23,6 +25,11 @@ logger = logging.getLogger(__name__)
 
 
 def main() -> None:
+    # Check for --version flag
+    if len(sys.argv) > 1 and sys.argv[1] in ("--version", "-v"):
+        print(f"writefreely-mcp-server {__version__}")
+        sys.exit(0)
+
     # Create the MCP server instance
     mcp = FastMCP(name="writefreely")
 
