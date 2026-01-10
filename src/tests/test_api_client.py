@@ -16,7 +16,6 @@ from writefreely_mcp_server.api_client import (
     get_user_posts,
     create_collection,
     get_collection,
-    update_collection,
     delete_collection,
     get_collection_post,
     create_collection_post,
@@ -336,27 +335,6 @@ class TestCollections:
         assert "error" in result
 
     @pytest.mark.asyncio
-    async def test_update_collection(self, mock_client):
-        """Test updating a collection."""
-        mock_response = mock_client._create_mock_response(
-            200,
-            json_data={
-                "data": {
-                    "alias": "myblog",
-                    "title": "Updated Blog",
-                    "description": "Updated description",
-                    "views": 100,
-                }
-            },
-        )
-        mock_client.put.return_value = mock_response
-
-        result = await update_collection(
-            "myblog", "token123", "Updated Blog", "Updated description"
-        )
-        assert result["title"] == "Updated Blog"
-
-    @pytest.mark.asyncio
     async def test_delete_collection(self, mock_client):
         """Test deleting a collection."""
         mock_response = mock_client._create_mock_response(204)
@@ -395,16 +373,20 @@ class TestCollections:
         mock_response = mock_client._create_mock_response(
             200,
             json_data={
-                "data": [
-                    {
-                        "id": "post1",
-                        "slug": "post-1",
-                        "title": "Post 1",
-                        "body": "Content 1",
-                        "created": "2024-01-01T00:00:00Z",
-                        "views": 10,
-                    }
-                ]
+                "data": {
+                    "alias": "myblog",
+                    "title": "My Blog",
+                    "posts": [
+                        {
+                            "id": "post1",
+                            "slug": "post-1",
+                            "title": "Post 1",
+                            "body": "Content 1",
+                            "created": "2024-01-01T00:00:00Z",
+                            "views": 10,
+                        }
+                    ],
+                }
             },
         )
         mock_client.get.return_value = mock_response

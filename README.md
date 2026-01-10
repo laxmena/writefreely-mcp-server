@@ -11,6 +11,32 @@ An MCP server for WriteFreely that enables AI agents to publish and manage conte
 
 ## Installation
 
+### Installing `uv` or `uvx`
+
+If you don't have `uv` or `uvx` installed, you can install them using one of the following methods:
+
+**macOS/Linux:**
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+**Windows (PowerShell):**
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+**Using Homebrew (macOS):**
+```bash
+brew install uv
+```
+
+**Using pip:**
+```bash
+pip install uv
+```
+
+After installation, `uvx` will be available as part of `uv`. See the [uv documentation](https://github.com/astral-sh/uv) for more details.
+
 ### Using `uvx` (recommended)
 
 ```bash
@@ -73,7 +99,6 @@ curl -X POST https://write.as/api/auth/login \
 - `list_my_posts()` - List all your posts
 - `list_my_collections()` - List all your collections/blogs
 - `browse_collection()` - Browse posts in a collection
-- `update_collection()` - Update collection metadata
 - `browse_public_feed()` - Browse the public feed
 
 ## License

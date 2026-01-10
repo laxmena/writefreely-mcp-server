@@ -7,7 +7,6 @@ from typing import Optional
 from ..api_client import (
     get_user_collections,
     get_collection_posts,
-    update_collection as api_update_collection,
     WriteAsError,
 )
 from ..config import BASE_URL, get_access_token
@@ -109,63 +108,5 @@ def register_tools(mcp):
 
         except WriteAsError as e:
             return f"Failed to browse collection: {str(e)}"
-        except Exception as e:
-            return f"Unexpected error: {str(e)}"
-
-    @mcp.tool()
-    async def update_collection(
-        collection_alias: str,
-        access_token: str = "",
-        title: Optional[str] = None,
-        description: Optional[str] = None,
-        style_sheet: Optional[str] = None,
-    ) -> str:
-        """
-        Modify collection metadata: title, description, or stylesheet.
-
-        Args:
-            collection_alias: The alias/name of the collection to update
-            access_token: Access token from login() or WRITEFREELY_ACCESS_TOKEN env var
-                         (optional if token is set via env var)
-            title: Optional new title for the collection
-            description: Optional new description
-            style_sheet: Optional custom CSS stylesheet
-
-        Returns:
-            Success message with updated collection info
-        """
-        try:
-            # Get token from parameter or environment variable
-            token = get_access_token(access_token)
-
-            if not token:
-                return "Error: Access token is required. Provide access_token parameter or set WRITEFREELY_ACCESS_TOKEN environment variable."
-
-            result = await api_update_collection(
-                alias=collection_alias,
-                access_token=token,
-                title=title,
-                description=description,
-                style_sheet=style_sheet,
-            )
-
-            alias = result.get("alias", collection_alias)
-            title_updated = result.get("title", title or "(unchanged)")
-            description_updated = result.get(
-                "description", description or "(unchanged)"
-            )
-            url = f"{BASE_URL}/api/collections/{alias}/posts"
-
-            msg = f"Collection updated successfully!\n"
-            msg += f"Alias: {alias}\n"
-            msg += f"Title: {title_updated}\n"
-            if description_updated:
-                msg += f"Description: {description_updated}\n"
-            msg += f"URL: {url}"
-
-            return msg
-
-        except WriteAsError as e:
-            return f"Failed to update collection: {str(e)}"
         except Exception as e:
             return f"Unexpected error: {str(e)}"

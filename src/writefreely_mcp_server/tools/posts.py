@@ -79,7 +79,10 @@ def register_tools(mcp):
             # For anonymous posts you get an edit token
             edit_token = result.get("token")
 
-            url = f"{BASE_URL}/{slug_or_id}"
+            if collection:
+                url = f"{BASE_URL}/{collection}/{slug_or_id}"
+            else:
+                url = f"{BASE_URL}/{slug_or_id}"
 
             msg = f"Post created successfully!\nURL: {url}\nID: {post_id}"
 
@@ -136,8 +139,19 @@ def register_tools(mcp):
             )
 
             post_id_updated = result.get("id", post_id)
-            slug_or_id = result.get("slug") or post_id_updated
-            url = f"{BASE_URL}/{slug_or_id}"
+            slug = result.get("slug")
+
+            # Check if post is published to a collection
+            collection = result.get("collection")
+            if collection:
+                # Post is in a collection: BASE_URL/{collection.alias}/{slug}
+                collection_alias = collection.get("alias", "")
+                # Use slug if available, otherwise fall back to post_id
+                url_slug = slug if slug else post_id_updated
+                url = f"{BASE_URL}/{collection_alias}/{url_slug}"
+            else:
+                # Anonymous post: BASE_URL/{post_id}
+                url = f"{BASE_URL}/{post_id_updated}"
 
             return f"Post updated successfully!\nURL: {url}\nID: {post_id_updated}"
 
@@ -251,11 +265,22 @@ def register_tools(mcp):
             result = f"Found {len(posts)} post(s):\n\n"
             for i, post in enumerate(posts, 1):
                 post_id = post.get("id", "unknown")
-                slug = post.get("slug") or post_id
+                slug = post.get("slug")
                 title = post.get("title", "(no title)")
                 created = post.get("created", "unknown date")
                 views = post.get("views", 0)
-                url = f"{BASE_URL}/{slug}"
+
+                # Check if post is published to a collection
+                collection = post.get("collection")
+                if collection:
+                    # Post is in a collection: BASE_URL/{collection.alias}/{slug}
+                    collection_alias = collection.get("alias", "")
+                    # Use slug if available, otherwise fall back to post_id
+                    url_slug = slug if slug else post_id
+                    url = f"{BASE_URL}/{collection_alias}/{url_slug}"
+                else:
+                    # Anonymous post: BASE_URL/{post_id}
+                    url = f"{BASE_URL}/{post_id}"
 
                 result += f"{i}. {title}\n"
                 result += f"   ID: {post_id}\n"

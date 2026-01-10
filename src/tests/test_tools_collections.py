@@ -30,15 +30,6 @@ def mock_get_collection_posts():
         yield mock
 
 
-@pytest.fixture
-def mock_update_collection():
-    """Mock the update_collection function."""
-    with patch(
-        "writefreely_mcp_server.tools.collections.api_update_collection"
-    ) as mock:
-        yield mock
-
-
 def get_tool_function(module, tool_name):
     """Helper to extract a tool function from a module."""
     captured_tools = {}
@@ -198,87 +189,4 @@ class TestBrowseCollection:
         tool_func = get_tool_function(collections, "browse_collection")
 
         result = await tool_func("myblog", page=1)
-        assert "failed" in result.lower()
-
-
-class TestUpdateCollection:
-    """Tests for the update_collection tool."""
-
-    @pytest.mark.asyncio
-    async def test_update_collection_success(
-        self, mock_get_access_token, mock_update_collection
-    ):
-        """Test successful collection update."""
-        mock_get_access_token.return_value = "token123"
-        mock_update_collection.return_value = {
-            "alias": "myblog",
-            "title": "Updated Blog",
-            "description": "Updated description",
-            "views": 100,
-        }
-
-        tool_func = get_tool_function(collections, "update_collection")
-
-        result = await tool_func(
-            "myblog", "token123", "Updated Blog", "Updated description"
-        )
-        assert "updated successfully" in result.lower()
-        assert "Updated Blog" in result
-        assert "Updated description" in result
-        mock_update_collection.assert_called_once_with(
-            alias="myblog",
-            access_token="token123",
-            title="Updated Blog",
-            description="Updated description",
-            style_sheet=None,
-        )
-
-    @pytest.mark.asyncio
-    async def test_update_collection_with_stylesheet(
-        self, mock_get_access_token, mock_update_collection
-    ):
-        """Test updating collection with stylesheet."""
-        mock_get_access_token.return_value = "token123"
-        mock_update_collection.return_value = {
-            "alias": "myblog",
-            "title": "My Blog",
-            "style_sheet": "body { color: red; }",
-        }
-
-        tool_func = get_tool_function(collections, "update_collection")
-
-        result = await tool_func(
-            "myblog", "token123", None, None, "body { color: red; }"
-        )
-        assert "updated successfully" in result.lower()
-        mock_update_collection.assert_called_once_with(
-            alias="myblog",
-            access_token="token123",
-            title=None,
-            description=None,
-            style_sheet="body { color: red; }",
-        )
-
-    @pytest.mark.asyncio
-    async def test_update_collection_no_token(self, mock_get_access_token):
-        """Test updating collection without token."""
-        mock_get_access_token.return_value = None
-
-        tool_func = get_tool_function(collections, "update_collection")
-
-        result = await tool_func("myblog", "", None, None, None)
-        assert "error" in result.lower()
-        assert "required" in result.lower()
-
-    @pytest.mark.asyncio
-    async def test_update_collection_error(
-        self, mock_get_access_token, mock_update_collection
-    ):
-        """Test collection update error handling."""
-        mock_get_access_token.return_value = "token123"
-        mock_update_collection.side_effect = WriteAsError("Update failed")
-
-        tool_func = get_tool_function(collections, "update_collection")
-
-        result = await tool_func("myblog", "token123", "New Title")
         assert "failed" in result.lower()

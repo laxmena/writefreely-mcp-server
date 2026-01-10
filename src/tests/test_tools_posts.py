@@ -285,18 +285,27 @@ class TestListMyPosts:
         mock_get_access_token.return_value = "token123"
         mock_get_user_posts.return_value = [
             {
-                "id": "post1",
-                "slug": "post-1",
-                "title": "Post 1",
-                "created": "2024-01-01T00:00:00Z",
-                "views": 10,
+                "id": "7xe2dbojynjs1dkk",
+                "slug": "cool-post",
+                "title": "",
+                "body": "Cool post!",
+                "created": "2017-11-12T03:49:36Z",
+                "views": 0,
+                "collection": {
+                    "alias": "matt",
+                    "title": "Matt",
+                    "description": "My great blog!",
+                    "public": True,
+                    "views": 46,
+                },
             },
             {
-                "id": "post2",
-                "slug": "post-2",
-                "title": "Post 2",
-                "created": "2024-01-02T00:00:00Z",
-                "views": 20,
+                "id": "rf3t35fkax0aw",
+                "slug": None,
+                "title": "My First Post",
+                "body": "This is a post.",
+                "created": "2016-07-09T01:43:46Z",
+                "views": 0,
             },
         ]
 
@@ -304,8 +313,10 @@ class TestListMyPosts:
 
         result = await tool_func("token123")
         assert "2 post(s)" in result
-        assert "Post 1" in result
-        assert "Post 2" in result
+        # Check that collection post URL is constructed correctly
+        assert "matt/cool-post" in result
+        # Check that anonymous post URL uses post_id
+        assert "rf3t35fkax0aw" in result
 
     @pytest.mark.asyncio
     async def test_list_my_posts_empty(

@@ -416,44 +416,6 @@ async def get_collection(alias: str, base_url: str = BASE_URL) -> Dict[str, Any]
         raise WriteAsError(f"Failed to get collection: {str(e)}")
 
 
-async def update_collection(
-    alias: str,
-    access_token: str,
-    title: Optional[str] = None,
-    description: Optional[str] = None,
-    style_sheet: Optional[str] = None,
-    base_url: str = BASE_URL,
-) -> Dict[str, Any]:
-    """Update a collection."""
-    url = f"{base_url}/api/collections/{alias}"
-
-    payload: Dict[str, Any] = {}
-    if title is not None:
-        payload["title"] = title
-    if description is not None:
-        payload["description"] = description
-    if style_sheet is not None:
-        payload["style_sheet"] = style_sheet
-
-    headers = _get_headers(access_token)
-
-    client = await _get_client()
-    try:
-        resp = await client.put(url, json=payload, headers=headers)
-        resp.raise_for_status()
-        data = resp.json().get("data", {})
-
-        # Try to validate with Pydantic
-        return _parse_response(CollectionResponse, data)
-
-    except httpx.HTTPStatusError as e:
-        raise WriteAsError(
-            f"Failed to update collection: {e.response.status_code} - {e.response.text}"
-        )
-    except Exception as e:
-        raise WriteAsError(f"Failed to update collection: {str(e)}")
-
-
 async def delete_collection(
     alias: str, access_token: str, base_url: str = BASE_URL
 ) -> bool:
@@ -558,8 +520,13 @@ async def get_collection_posts(
     try:
         resp = await client.get(url, params=params)
         resp.raise_for_status()
-        data = resp.json().get("data", [])
-        return data if isinstance(data, list) else []
+        response_data = resp.json().get("data", {})
+        # The API returns data as an object with a "posts" array
+        if isinstance(response_data, dict):
+            posts = response_data.get("posts", [])
+            return posts if isinstance(posts, list) else []
+        # Fallback: if data is already a list (for backwards compatibility)
+        return response_data if isinstance(response_data, list) else []
     except httpx.HTTPStatusError as e:
         raise WriteAsError(f"Failed to get collection posts: {e.response.status_code}")
     except Exception as e:
@@ -710,7 +677,7 @@ async def get_read_writeas_posts(
     skip: Number of posts to skip (for pagination).
     Returns 10 posts per request.
     """
-    url = f"{base_url}/api/read"
+    url = f"{base_url}/api/posts"
 
     params = {}
     if skip > 0:

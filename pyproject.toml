@@ -1,6 +1,6 @@
 [project]
 name = "writefreely-mcp-server"
-version = "0.1.0"
+version = "0.1.1"
 description = "An MCP server for interacting with WriteFreely API, enabling AI agents like Claude to perform blogging actions. Supports both self-hosted WriteFreely instances and the Write.as hosted service. This is a community-built, independent project."
 authors = [{ name = "Lakshmanan Meiyappan" }]
 license = "MIT" 

@@ -4,6 +4,34 @@ This document contains information for developers who want to contribute to or m
 
 ## Setup
 
+### Installing `uv`
+
+This project uses `uv` for dependency management. If you don't have `uv` installed:
+
+**macOS/Linux:**
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+**Windows (PowerShell):**
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+**Using Homebrew (macOS):**
+```bash
+brew install uv
+```
+
+**Using pip:**
+```bash
+pip install uv
+```
+
+See the [uv documentation](https://github.com/astral-sh/uv) for more installation options and details.
+
+### Installing Dependencies
+
 Clone the repository and install dependencies:
 
 ```bash
@@ -200,10 +228,38 @@ uv run pre-commit install
 
 ## Building and Publishing
 
+### Versioning
+
+Before building and publishing, update the version number in `pyproject.toml`:
+
+```toml
+[project]
+version = "0.1.1"  # Update this (e.g., 0.1.0 -> 0.1.1 for patch, 0.1.0 -> 0.2.0 for minor, 0.1.0 -> 1.0.0 for major)
+```
+
+Follow [Semantic Versioning](https://semver.org/):
+- **Patch version** (0.1.0 → 0.1.1): Bug fixes, documentation updates
+- **Minor version** (0.1.0 → 0.2.0): New features, backwards compatible
+- **Major version** (0.1.0 → 1.0.0): Breaking changes
+
+After updating the version, commit the change:
+```bash
+git add pyproject.toml
+git commit -m "chore: bump version to X.Y.Z"
+```
+
+### Building
+
 Build the package:
 
 ```bash
 uv build
+```
+
+Or if using standard Python tools:
+
+```bash
+python3 -m build
 ```
 
 This will create distribution files in the `dist/` directory.
@@ -231,9 +287,14 @@ uv pip install --index-url https://test.pypi.org/simple/ --extra-index-url https
 **Then publish to production PyPI:**
 
 ```bash
-# Upload to production PyPI
+# Upload to production PyPI (all files in dist/)
 twine upload dist/*
+
+# Or upload only the new version files (recommended if you have old versions in dist/)
+twine upload dist/writefreely_mcp_server-X.Y.Z*
 ```
+
+Replace `X.Y.Z` with your version number (e.g., `0.1.1`).
 
 **Note:** You'll need PyPI accounts:
 - Test PyPI: https://test.pypi.org/account/register/
