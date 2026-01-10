@@ -14,7 +14,7 @@ An MCP server for WriteFreely that enables AI agents to publish and manage conte
 ### Using `uvx` (recommended)
 
 ```bash
-uvx writefreely-mcp-server
+uvx --from writefreely-mcp-server writefreely-mcp
 ```
 
 ### Using `uv`
@@ -53,7 +53,7 @@ curl -X POST https://write.as/api/auth/login \
   "mcpServers": {
     "writefreely": {
       "command": "uvx",
-      "args": ["writefreely-mcp-server"],
+      "args": ["--from", "writefreely-mcp-server", "writefreely-mcp"],
       "env": {
         "WRITEFREELY_BASE_URL": "https://write.as",
         "WRITEFREELY_ACCESS_TOKEN": "your_token_here"
