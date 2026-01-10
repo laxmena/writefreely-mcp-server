@@ -3,16 +3,17 @@ Post management tools for WriteFreely MCP server.
 """
 
 import logging
-from typing import Optional
 
 from ..api_client import (
-    create_post,
-    create_collection_post,
-    get_post,
-    update_post,
-    delete_post as api_delete_post,
-    get_user_posts,
     WriteAsError,
+    create_collection_post,
+    create_post,
+    get_post,
+    get_user_posts,
+    update_post,
+)
+from ..api_client import (
+    delete_post as api_delete_post,
 )
 from ..config import BASE_URL, get_access_token
 
@@ -25,9 +26,9 @@ def register_tools(mcp):
     @mcp.tool()
     async def publish_post(
         content: str,
-        title: Optional[str] = None,
-        access_token: Optional[str] = None,
-        collection: Optional[str] = None,
+        title: str | None = None,
+        access_token: str | None = None,
+        collection: str | None = None,
     ) -> str:
         """
         Create and publish a new post on WriteFreely.
@@ -57,9 +58,14 @@ def register_tools(mcp):
             if collection:
                 if not token:
                     logger.warning(
-                        f"Attempted to publish to collection {collection} without authentication"
+                        f"Attempted to publish to collection {collection} "
+                        "without authentication"
                     )
-                    return "Error: Publishing to a collection requires authentication. Please provide an access_token or set WRITEFREELY_ACCESS_TOKEN environment variable."
+                    return (
+                        "Error: Publishing to a collection requires authentication. "
+                        "Please provide an access_token or set "
+                        "WRITEFREELY_ACCESS_TOKEN environment variable."
+                    )
                 result = await create_collection_post(
                     collection_alias=collection,
                     body=content,
@@ -102,9 +108,9 @@ def register_tools(mcp):
     async def edit_post(
         post_id: str,
         content: str,
-        title: Optional[str] = None,
+        title: str | None = None,
         access_token: str = "",
-        edit_token: Optional[str] = None,
+        edit_token: str | None = None,
     ) -> str:
         """
         Update an existing post's content and/or title.
@@ -124,18 +130,24 @@ def register_tools(mcp):
             # Get token from parameter or environment variable
             token = get_access_token(access_token)
             logger.debug(
-                f"Editing post {post_id} - has_token: {bool(token)}, has_edit_token: {bool(edit_token)}"
+                f"Editing post {post_id} - has_token: {bool(token)}, "
+                f"has_edit_token: {bool(edit_token)}"
             )
 
             if not token and not edit_token:
                 logger.warning(f"Attempted to edit post {post_id} without token")
-                return "Error: Either access_token (for authenticated posts) or edit_token (for anonymous posts) is required. You can also set WRITEFREELY_ACCESS_TOKEN environment variable."
+                return (
+                    "Error: Either access_token (for authenticated posts) or "
+                    "edit_token (for anonymous posts) is required. "
+                    "You can also set WRITEFREELY_ACCESS_TOKEN environment variable."
+                )
 
             result = await update_post(
                 post_id=post_id,
                 body=content,
                 title=title,
                 access_token=token if token else "",
+                edit_token=edit_token,
             )
 
             post_id_updated = result.get("id", post_id)
@@ -164,7 +176,7 @@ def register_tools(mcp):
     async def delete_post(
         post_id: str,
         access_token: str = "",
-        edit_token: Optional[str] = None,
+        edit_token: str | None = None,
     ) -> str:
         """
         Permanently delete a post.
@@ -182,12 +194,17 @@ def register_tools(mcp):
             # Get token from parameter or environment variable
             token = get_access_token(access_token)
             logger.debug(
-                f"Deleting post {post_id} - has_token: {bool(token)}, has_edit_token: {bool(edit_token)}"
+                f"Deleting post {post_id} - has_token: {bool(token)}, "
+                f"has_edit_token: {bool(edit_token)}"
             )
 
             if not token and not edit_token:
                 logger.warning(f"Attempted to delete post {post_id} without token")
-                return "Error: Either access_token (for authenticated posts) or edit_token (for anonymous posts) is required. You can also set WRITEFREELY_ACCESS_TOKEN environment variable."
+                return (
+                    "Error: Either access_token (for authenticated posts) or "
+                    "edit_token (for anonymous posts) is required. "
+                    "You can also set WRITEFREELY_ACCESS_TOKEN environment variable."
+                )
 
             success = await api_delete_post(
                 post_id=post_id,
@@ -206,7 +223,7 @@ def register_tools(mcp):
             return f"Unexpected error: {str(e)}"
 
     @mcp.tool()
-    async def read_post(post_id: str, access_token: Optional[str] = None) -> str:
+    async def read_post(post_id: str, access_token: str | None = None) -> str:
         """
         Retrieve the content of an existing post by its ID.
 
@@ -255,7 +272,10 @@ def register_tools(mcp):
 
             if not token:
                 logger.warning("Attempted to list user posts without authentication")
-                return "Error: Access token is required. Provide access_token parameter or set WRITEFREELY_ACCESS_TOKEN environment variable."
+                return (
+                    "Error: Access token is required. Provide access_token "
+                    "parameter or set WRITEFREELY_ACCESS_TOKEN environment variable."
+                )
 
             posts = await get_user_posts(token)
 

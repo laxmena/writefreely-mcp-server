@@ -2,18 +2,19 @@
 Tests for configuration module.
 """
 
-import pytest
 import os
 from unittest.mock import patch
 
+import pytest
+
 from writefreely_mcp_server.config import (
-    get_base_url,
-    get_access_token,
     BASE_URL,
-    WRITEAS_URL,
+    DEFAULT_LANGUAGE,
     READ_WRITEAS_URL,
     REQUEST_TIMEOUT,
-    DEFAULT_LANGUAGE,
+    WRITEAS_URL,
+    get_access_token,
+    get_base_url,
 )
 
 
@@ -34,6 +35,7 @@ class TestGetBaseUrl:
         with patch.dict(os.environ, {"WRITEFREELY_BASE_URL": env_value}):
             # Re-import to get updated value
             from importlib import reload
+
             from writefreely_mcp_server import config
 
             reload(config)

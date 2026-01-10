@@ -9,8 +9,9 @@ to support both self-hosted WriteFreely instances and the Write.as hosted servic
 
 import asyncio
 import logging
+from typing import Any
+
 import httpx
-from typing import Any, Dict, List, Optional, Type
 from pydantic import BaseModel, ValidationError
 
 from .config import BASE_URL, READ_WRITEAS_URL, REQUEST_TIMEOUT
@@ -18,7 +19,7 @@ from .config import BASE_URL, READ_WRITEAS_URL, REQUEST_TIMEOUT
 logger = logging.getLogger(__name__)
 
 # Shared HTTP client instance for connection pooling and efficiency
-_client: Optional[httpx.AsyncClient] = None
+_client: httpx.AsyncClient | None = None
 _client_lock = asyncio.Lock()
 
 
@@ -32,12 +33,12 @@ class PostResponse(BaseModel):
     """Post response model."""
 
     id: str
-    slug: Optional[str] = None
-    token: Optional[str] = None  # edit/delete token for anonymous posts
+    slug: str | None = None
+    token: str | None = None  # edit/delete token for anonymous posts
     body: str
-    title: Optional[str] = None
+    title: str | None = None
     created: str
-    updated: Optional[str] = None
+    updated: str | None = None
     views: int = 0
 
 
@@ -52,7 +53,7 @@ class UserResponse(BaseModel):
 
     id: str
     username: str
-    email: Optional[str] = None
+    email: str | None = None
 
 
 class CollectionResponse(BaseModel):
@@ -60,8 +61,8 @@ class CollectionResponse(BaseModel):
 
     alias: str
     title: str
-    description: Optional[str] = None
-    style_sheet: Optional[str] = None
+    description: str | None = None
+    style_sheet: str | None = None
     views: int = 0
 
 
@@ -73,7 +74,7 @@ class ChannelResponse(BaseModel):
     method: str  # e.g., "tumblr", "medium"
 
 
-def _get_headers(access_token: Optional[str] = None) -> Dict[str, str]:
+def _get_headers(access_token: str | None = None) -> dict[str, str]:
     """Get request headers with optional authorization."""
     headers = {
         "Accept": "application/json",
@@ -85,10 +86,11 @@ def _get_headers(access_token: Optional[str] = None) -> Dict[str, str]:
 
 
 def _parse_response(
-    model_class: Type[BaseModel], data: Dict[str, Any]
-) -> Dict[str, Any]:
+    model_class: type[BaseModel], data: dict[str, Any]
+) -> dict[str, Any]:
     """
-    Parse response data using Pydantic model, falling back to raw data on validation error.
+    Parse response data using Pydantic model, falling back to raw data
+    on validation error.
 
     Args:
         model_class: Pydantic model class to validate against
@@ -174,22 +176,23 @@ async def logout(access_token: str, base_url: str = BASE_URL) -> bool:
 
 async def create_post(
     body: str,
-    title: Optional[str] = None,
-    access_token: Optional[str] = None,
-    created: Optional[str] = None,  # ISO 8601 format
+    title: str | None = None,
+    access_token: str | None = None,
+    created: str | None = None,  # ISO 8601 format
     base_url: str = BASE_URL,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Create a new post (anonymous or authenticated, but NOT in a blog collection).
     - With access_token → authenticated post
-    - Without token → anonymous post (returns edit token), will be deleted in few hours automatically
+    - Without token → anonymous post (returns edit token),
+      will be deleted in few hours automatically
     - created: Optional ISO 8601 datetime string for backdating posts
 
     For posting to a collection, use create_collection_post() instead.
     """
     url = f"{base_url}/api/posts"
 
-    payload: Dict[str, Any] = {
+    payload: dict[str, Any] = {
         "body": body,
         "title": title or "",
     }
@@ -202,9 +205,8 @@ async def create_post(
 
     client = await _get_client()
     try:
-        logger.debug(
-            f"Creating {'authenticated' if is_authenticated else 'anonymous'} post at {url}"
-        )
+        post_type = "authenticated" if is_authenticated else "anonymous"
+        logger.debug(f"Creating {post_type} post at {url}")
         resp = await client.post(url, json=payload, headers=headers)
         resp.raise_for_status()
         data = resp.json().get("data", {})
@@ -230,8 +232,8 @@ async def create_post(
 
 
 async def get_post(
-    post_id: str, access_token: Optional[str] = None, base_url: str = BASE_URL
-) -> Dict[str, Any]:
+    post_id: str, access_token: str | None = None, base_url: str = BASE_URL
+) -> dict[str, Any]:
     """Retrieve a single post by ID."""
     url = f"{base_url}/api/posts/{post_id}"
     headers = _get_headers(access_token)
@@ -256,11 +258,11 @@ async def get_post(
 async def update_post(
     post_id: str,
     body: str,
-    title: Optional[str] = None,
-    access_token: Optional[str] = None,
-    edit_token: Optional[str] = None,
+    title: str | None = None,
+    access_token: str | None = None,
+    edit_token: str | None = None,
     base_url: str = BASE_URL,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Update existing post (requires access_token or edit_token)."""
     url = f"{base_url}/api/posts/{post_id}"
 
@@ -290,7 +292,8 @@ async def update_post(
 
     except httpx.HTTPStatusError as e:
         logger.error(
-            f"Failed to update post {post_id}: HTTP {e.response.status_code} - {e.response.text}"
+            f"Failed to update post {post_id}: "
+            f"HTTP {e.response.status_code} - {e.response.text}"
         )
         raise WriteAsError(
             f"Update failed: {e.response.status_code} - {e.response.text}"
@@ -302,13 +305,14 @@ async def update_post(
 
 async def delete_post(
     post_id: str,
-    access_token: Optional[str] = None,
-    edit_token: Optional[str] = None,
+    access_token: str | None = None,
+    edit_token: str | None = None,
     base_url: str = BASE_URL,
 ) -> bool:
     """
     Delete a post permanently.
-    Requires either access_token (for authenticated posts) or edit_token (for anonymous posts).
+    Requires either access_token (for authenticated posts) or
+    edit_token (for anonymous posts).
     """
     url = f"{base_url}/api/posts/{post_id}"
 
@@ -325,7 +329,8 @@ async def delete_post(
         return True
     except httpx.HTTPStatusError as e:
         logger.error(
-            f"Failed to delete post {post_id}: HTTP {e.response.status_code} - {e.response.text}"
+            f"Failed to delete post {post_id}: "
+            f"HTTP {e.response.status_code} - {e.response.text}"
         )
         raise WriteAsError(
             f"Delete failed: {e.response.status_code} - {e.response.text}"
@@ -337,7 +342,7 @@ async def delete_post(
 
 async def get_user_posts(
     access_token: str, base_url: str = BASE_URL
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """Retrieve all posts for the authenticated user."""
     url = f"{base_url}/api/me/posts"
     headers = _get_headers(access_token)
@@ -363,13 +368,13 @@ async def create_collection(
     alias: str,
     title: str,
     access_token: str,
-    description: Optional[str] = None,
+    description: str | None = None,
     base_url: str = BASE_URL,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Create a new collection (blog)."""
     url = f"{base_url}/api/collections"
 
-    payload: Dict[str, Any] = {
+    payload: dict[str, Any] = {
         "alias": alias,
         "title": title,
     }
@@ -395,7 +400,7 @@ async def create_collection(
         raise WriteAsError(f"Failed to create collection: {str(e)}")
 
 
-async def get_collection(alias: str, base_url: str = BASE_URL) -> Dict[str, Any]:
+async def get_collection(alias: str, base_url: str = BASE_URL) -> dict[str, Any]:
     """Retrieve a collection by alias."""
     url = f"{base_url}/api/collections/{alias}"
 
@@ -438,7 +443,7 @@ async def delete_collection(
 
 async def get_collection_post(
     collection_alias: str, post_slug: str, base_url: str = BASE_URL
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Retrieve a specific post from a collection by slug."""
     url = f"{base_url}/api/collections/{collection_alias}/posts/{post_slug}"
 
@@ -462,11 +467,11 @@ async def get_collection_post(
 async def create_collection_post(
     collection_alias: str,
     body: str,
-    title: Optional[str] = None,
+    title: str | None = None,
     access_token: str = "",
-    created: Optional[str] = None,  # ISO 8601 format
+    created: str | None = None,  # ISO 8601 format
     base_url: str = BASE_URL,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Publish a new post to a collection (blog).
     Requires authentication (access_token).
@@ -476,7 +481,7 @@ async def create_collection_post(
     """
     url = f"{base_url}/api/collections/{collection_alias}/posts"
 
-    payload: Dict[str, Any] = {
+    payload: dict[str, Any] = {
         "body": body,
         "title": title or "",
     }
@@ -497,7 +502,8 @@ async def create_collection_post(
 
     except httpx.HTTPStatusError as e:
         raise WriteAsError(
-            f"Failed to create collection post: {e.response.status_code} - {e.response.text}"
+            f"Failed to create collection post: "
+            f"{e.response.status_code} - {e.response.text}"
         )
     except Exception as e:
         raise WriteAsError(f"Unexpected error creating collection post: {str(e)}")
@@ -505,7 +511,7 @@ async def create_collection_post(
 
 async def get_collection_posts(
     collection_alias: str, page: int = 1, base_url: str = BASE_URL
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """
     Retrieve posts from a collection.
     Returns up to 10 posts per page. Use page parameter for pagination.
@@ -535,7 +541,7 @@ async def get_collection_posts(
 
 async def move_post_to_collection(
     post_id: str, collection_alias: str, access_token: str, base_url: str = BASE_URL
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Move a post to a collection."""
     url = f"{base_url}/api/collections/{collection_alias}/posts/{post_id}"
     headers = _get_headers(access_token)
@@ -551,7 +557,8 @@ async def move_post_to_collection(
 
     except httpx.HTTPStatusError as e:
         raise WriteAsError(
-            f"Failed to move post to collection: {e.response.status_code} - {e.response.text}"
+            f"Failed to move post to collection: "
+            f"{e.response.status_code} - {e.response.text}"
         )
     except Exception as e:
         raise WriteAsError(f"Failed to move post to collection: {str(e)}")
@@ -599,7 +606,7 @@ async def unpin_post_from_collection(
 
 async def get_user_collections(
     access_token: str, base_url: str = BASE_URL
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """Retrieve all collections for the authenticated user."""
     url = f"{base_url}/api/me/collections"
     headers = _get_headers(access_token)
@@ -612,11 +619,13 @@ async def get_user_collections(
         return data if isinstance(data, list) else []
     except httpx.HTTPStatusError as e:
         raise WriteAsError(
-            f"Failed to get user collections: {e.response.status_code}, url: {url}, access_token: {access_token}"
+            f"Failed to get user collections: {e.response.status_code}, "
+            f"url: {url}, access_token: {access_token}"
         )
     except Exception as e:
         raise WriteAsError(
-            f"Failed to get user collections: {str(e)}, url: {url}, access_token: {access_token}"
+            f"Failed to get user collections: {str(e)}, "
+            f"url: {url}, access_token: {access_token}"
         )
 
 
@@ -625,7 +634,7 @@ async def get_user_collections(
 # ============================================================================
 
 
-async def get_user(access_token: str, base_url: str = BASE_URL) -> Dict[str, Any]:
+async def get_user(access_token: str, base_url: str = BASE_URL) -> dict[str, Any]:
     """Retrieve authenticated user information."""
     url = f"{base_url}/api/me"
     headers = _get_headers(access_token)
@@ -647,7 +656,7 @@ async def get_user(access_token: str, base_url: str = BASE_URL) -> Dict[str, Any
 
 async def get_user_channels(
     access_token: str, base_url: str = BASE_URL
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """Retrieve channels (Tumblr, Medium, etc.) for the authenticated user."""
     url = f"{base_url}/api/me/channels"
     headers = _get_headers(access_token)
@@ -671,7 +680,7 @@ async def get_user_channels(
 
 async def get_read_writeas_posts(
     skip: int = 0, base_url: str = READ_WRITEAS_URL
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """
     Retrieve posts from read.write.as (public writing feed).
     skip: Number of posts to skip (for pagination).

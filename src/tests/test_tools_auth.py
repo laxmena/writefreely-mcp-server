@@ -2,8 +2,9 @@
 Tests for authentication tools.
 """
 
-import pytest
 from unittest.mock import patch
+
+import pytest
 
 from writefreely_mcp_server.tools import auth
 

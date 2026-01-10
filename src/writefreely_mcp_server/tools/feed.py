@@ -2,7 +2,7 @@
 Public feed tools for WriteFreely MCP server.
 """
 
-from ..api_client import get_read_writeas_posts, WriteAsError
+from ..api_client import WriteAsError, get_read_writeas_posts
 from ..config import BASE_URL
 
 
@@ -15,7 +15,8 @@ def register_tools(mcp):
         Read posts from the public read.write.as feed.
 
         Args:
-            skip: Number of posts to skip for pagination (default: 0, returns 10 posts per request)
+            skip: Number of posts to skip for pagination
+                (default: 0, returns 10 posts per request)
 
         Returns:
             Formatted list of posts from the public feed
@@ -52,7 +53,10 @@ def register_tools(mcp):
                 result += f"   Views: {views}\n\n"
 
             if len(posts) == 10:
-                result += f"Note: There are more posts. Use skip={skip + 10} to see the next page."
+                result += (
+                    f"Note: There are more posts. Use skip={skip + 10} "
+                    "to see the next page."
+                )
 
             return result.strip()
 

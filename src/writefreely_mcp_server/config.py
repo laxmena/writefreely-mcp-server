@@ -1,7 +1,5 @@
 import logging
 import os
-from pathlib import Path
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +23,7 @@ def get_base_url() -> str:
     return BASE_URL
 
 
-def get_access_token(provided_token: Optional[str] = None) -> Optional[str]:
+def get_access_token(provided_token: str | None = None) -> str | None:
     """
     Get access token from provided parameter or environment variable.
 

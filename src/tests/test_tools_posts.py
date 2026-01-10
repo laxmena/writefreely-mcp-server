@@ -2,11 +2,12 @@
 Tests for post management tools.
 """
 
-import pytest
 from unittest.mock import patch
 
-from writefreely_mcp_server.tools import posts
+import pytest
+
 from writefreely_mcp_server.api_client import WriteAsError
+from writefreely_mcp_server.tools import posts
 
 
 @pytest.fixture

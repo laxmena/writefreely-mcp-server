@@ -11,7 +11,7 @@ import os
 from mcp.server.fastmcp import FastMCP
 
 from .config import BASE_URL
-from .tools import auth, posts, collections, feed
+from .tools import auth, collections, feed, posts
 
 # Configure logging
 log_level = os.getenv("LOG_LEVEL", "INFO").upper()

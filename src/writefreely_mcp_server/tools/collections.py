@@ -2,12 +2,11 @@
 Collection/blog management tools for WriteFreely MCP server.
 """
 
-from typing import Optional
 
 from ..api_client import (
-    get_user_collections,
-    get_collection_posts,
     WriteAsError,
+    get_collection_posts,
+    get_user_collections,
 )
 from ..config import BASE_URL, get_access_token
 
@@ -16,7 +15,7 @@ def register_tools(mcp):
     """Register collection management tools with the MCP server."""
 
     @mcp.tool()
-    async def list_my_collections(access_token: Optional[str] = None) -> str:
+    async def list_my_collections(access_token: str | None = None) -> str:
         """
         Get all blogs/collections owned by the authenticated user.
 
@@ -32,7 +31,10 @@ def register_tools(mcp):
             token = get_access_token(access_token)
 
             if not token:
-                return "Error: Access token is required. Provide access_token parameter or set WRITEFREELY_ACCESS_TOKEN environment variable."
+                return (
+                    "Error: Access token is required. Provide access_token "
+                    "parameter or set WRITEFREELY_ACCESS_TOKEN environment variable."
+                )
 
             collections = await get_user_collections(token)
 
@@ -84,7 +86,10 @@ def register_tools(mcp):
                     f"No posts found in collection '{collection_alias}' (page {page})."
                 )
 
-            result = f"Collection '{collection_alias}' - Page {page} ({len(posts)} post(s)):\n\n"
+            result = (
+                f"Collection '{collection_alias}' - Page {page} "
+                f"({len(posts)} post(s)):\n\n"
+            )
             for i, post in enumerate(posts, 1):
                 post_id = post.get("id", "unknown")
                 slug = post.get("slug") or post_id

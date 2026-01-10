@@ -2,8 +2,9 @@
 Shared pytest fixtures for test suite.
 """
 
+from unittest.mock import MagicMock
+
 import pytest
-from unittest.mock import AsyncMock, MagicMock
 
 
 @pytest.fixture

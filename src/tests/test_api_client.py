@@ -2,34 +2,30 @@
 Tests for the WriteFreely API client.
 """
 
-import pytest
+from unittest.mock import AsyncMock, MagicMock, patch
+
 import httpx
-from unittest.mock import patch, AsyncMock, MagicMock
+import pytest
 
 from writefreely_mcp_server.api_client import (
+    WriteAsError,
     authenticate,
-    logout,
-    create_post,
-    get_post,
-    update_post,
-    delete_post,
-    get_user_posts,
     create_collection,
-    get_collection,
-    delete_collection,
-    get_collection_post,
     create_collection_post,
+    create_post,
+    delete_collection,
+    delete_post,
+    get_collection,
     get_collection_posts,
-    get_user_collections,
+    get_post,
+    get_read_writeas_posts,
     get_user,
     get_user_channels,
-    get_read_writeas_posts,
+    get_user_collections,
+    get_user_posts,
+    logout,
     render_markdown,
-    WriteAsError,
-    PostResponse,
-    AuthResponse,
-    UserResponse,
-    CollectionResponse,
+    update_post,
 )
 
 

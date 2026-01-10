@@ -2,11 +2,12 @@
 Tests for feed tools.
 """
 
-import pytest
 from unittest.mock import patch
 
-from writefreely_mcp_server.tools import feed
+import pytest
+
 from writefreely_mcp_server.api_client import WriteAsError
+from writefreely_mcp_server.tools import feed
 
 
 @pytest.fixture

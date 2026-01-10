@@ -20,12 +20,15 @@ def register_tools(mcp):
 
         If WRITEFREELY_ACCESS_TOKEN environment variable is set, this tool will use
         that token automatically without requiring username and password.
-        You can provide username and password to authenticate with a different account,
-        or use the environment variable for better security (recommended for production).
+        You can provide username and password to authenticate with a different
+        account, or use the environment variable for better security
+        (recommended for production).
 
         Args:
-            username: Your WriteFreely username (optional if WRITEFREELY_ACCESS_TOKEN is set)
-            password: Your WriteFreely password (optional if WRITEFREELY_ACCESS_TOKEN is set)
+            username: Your WriteFreely username
+                (optional if WRITEFREELY_ACCESS_TOKEN is set)
+            password: Your WriteFreely password
+                (optional if WRITEFREELY_ACCESS_TOKEN is set)
 
         Returns:
             Success message with access token, or information about existing token
@@ -49,8 +52,8 @@ def register_tools(mcp):
                 "Login attempted without credentials and no token in environment"
             )
             return (
-                "Error: Username and password are required when WRITEFREELY_ACCESS_TOKEN "
-                "is not set in the environment.\n"
+                "Error: Username and password are required when "
+                "WRITEFREELY_ACCESS_TOKEN is not set in the environment.\n"
                 "Either provide username and password, or set WRITEFREELY_ACCESS_TOKEN "
                 "environment variable."
             )
