@@ -4,6 +4,8 @@ Post management tools for WriteFreely MCP server.
 
 import logging
 
+from mcp.server.fastmcp import FastMCP
+
 from ..api_client import (
     WriteAsError,
     create_collection_post,
@@ -20,7 +22,7 @@ from ..config import BASE_URL, get_access_token
 logger = logging.getLogger(__name__)
 
 
-def register_tools(mcp):
+def register_tools(mcp: FastMCP) -> None:
     """Register post management tools with the MCP server."""
 
     @mcp.tool()
@@ -241,7 +243,8 @@ def register_tools(mcp):
             data = await get_post(post_id, token)
 
             if "error" in data:
-                return data["error"]
+                error_msg: str = data.get("error", "Unknown error")
+                return error_msg
 
             title = data.get("title", "(no title)")
             body = data.get("body", "(empty)")

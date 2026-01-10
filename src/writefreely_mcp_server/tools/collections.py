@@ -2,6 +2,7 @@
 Collection/blog management tools for WriteFreely MCP server.
 """
 
+from mcp.server.fastmcp import FastMCP
 
 from ..api_client import (
     WriteAsError,
@@ -11,7 +12,7 @@ from ..api_client import (
 from ..config import BASE_URL, get_access_token
 
 
-def register_tools(mcp):
+def register_tools(mcp: FastMCP) -> None:
     """Register collection management tools with the MCP server."""
 
     @mcp.tool()

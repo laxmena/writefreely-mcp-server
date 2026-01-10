@@ -720,7 +720,8 @@ async def render_markdown(markdown: str, base_url: str = BASE_URL) -> str:
         resp.raise_for_status()
         data = resp.json()
         # The API returns HTML in the response
-        return data.get("data", {}).get("html", markdown)
+        html: str = data.get("data", {}).get("html", markdown)
+        return html
     except httpx.HTTPStatusError as e:
         raise WriteAsError(
             f"Failed to render markdown: {e.response.status_code} - {e.response.text}"

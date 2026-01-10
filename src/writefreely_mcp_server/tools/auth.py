@@ -4,13 +4,15 @@ Authentication tools for WriteFreely MCP server.
 
 import logging
 
+from mcp.server.fastmcp import FastMCP
+
 from ..api_client import authenticate
 from ..config import get_access_token
 
 logger = logging.getLogger(__name__)
 
 
-def register_tools(mcp):
+def register_tools(mcp: FastMCP) -> None:
     """Register authentication tools with the MCP server."""
 
     @mcp.tool()

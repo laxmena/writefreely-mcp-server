@@ -2,11 +2,13 @@
 Public feed tools for WriteFreely MCP server.
 """
 
+from mcp.server.fastmcp import FastMCP
+
 from ..api_client import WriteAsError, get_read_writeas_posts
 from ..config import BASE_URL
 
 
-def register_tools(mcp):
+def register_tools(mcp: FastMCP) -> None:
     """Register feed tools with the MCP server."""
 
     @mcp.tool()

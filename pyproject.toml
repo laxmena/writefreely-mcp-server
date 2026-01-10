@@ -1,6 +1,6 @@
 [project]
 name = "writefreely-mcp-server"
-version = "0.1.1"
+version = "0.1.2"
 description = "An MCP server for interacting with WriteFreely API, enabling AI agents like Claude to perform blogging actions. Supports both self-hosted WriteFreely instances and the Write.as hosted service. This is a community-built, independent project."
 authors = [{ name = "Lakshmanan Meiyappan" }]
 license = "MIT" 
@@ -68,3 +68,13 @@ lint.ignore = []
 python_version = "3.10"
 strict = true  # Enforce type hints
 ignore_missing_imports = true  # For external deps like mcp
+# Ignore untyped decorator errors (FastMCP decorators are untyped)
+disable_error_code = ["untyped-decorator"]
+
+# Exclude test files from strict type checking
+[[tool.mypy.overrides]]
+module = [
+    "tests.*",
+    "src.tests.*",
+]
+ignore_errors = true

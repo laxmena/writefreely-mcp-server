@@ -8,7 +8,7 @@ import pytest
 
 
 @pytest.fixture
-def mock_mcp():
+def mock_mcp() -> MagicMock:
     """Create a mock MCP server instance."""
     mcp = MagicMock()
     return mcp
