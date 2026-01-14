@@ -1,5 +1,14 @@
 # writefreely-mcp-server
 
+<p align="center">
+<a href="https://github.com/laxmena/writefreely-mcp-server"><img alt="Source Code" src="https://img.shields.io/badge/source-code-blue"/></a>
+<a href="https://github.com/laxmena/writefreely-mcp-server"><img alt="Issues" src="https://img.shields.io/badge/issue-tracker-blue"/></a>
+<img alt="Python 3.10 | 3.11 | 3.12 " src="https://img.shields.io/pypi/pyversions/writefreely-mcp-server"/>
+<a href="https://pypi.org/project/writefreely-mcp-server/"><img alt="PyPI" src="https://img.shields.io/pypi/v/writefreely-mcp-server"/></a>
+<a href="https://github.com/laxmena/writefreely-mcp-server/tree/main/LICENSE"><img alt="MIT License" src="https://img.shields.io/pypi/l/writefreely-mcp-server"/></a>
+</p>
+
+
 An MCP server for WriteFreely that enables AI agents to publish and manage content on WriteFreely instances (including self-hosted instances and Write.as).
 
 ## Features
