@@ -6,6 +6,7 @@
 <img alt="Python 3.10 | 3.11 | 3.12 " src="https://img.shields.io/pypi/pyversions/writefreely-mcp-server"/>
 <a href="https://pypi.org/project/writefreely-mcp-server/"><img alt="PyPI" src="https://img.shields.io/pypi/v/writefreely-mcp-server"/></a>
 <a href="https://github.com/laxmena/writefreely-mcp-server/tree/main/LICENSE"><img alt="MIT License" src="https://img.shields.io/pypi/l/writefreely-mcp-server"/></a>
+<a href="https://pypi.org/project/writefreely-mcp-server/"><img alt="PyPI - Downloads" src="https://img.shields.io/pypi/dm/writefreely-mcp-server"></a>
 </p>
 
 
